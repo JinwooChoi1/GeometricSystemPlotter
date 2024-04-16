@@ -20,7 +20,7 @@ function options = contoptions(options)
         options.outfcn = [];
         options.ncpfcn = [];
         options.iterlimit (1,1) {mustBeInteger,mustBePositive}  = 200;
-        options.optimalitystop (1,1) {mustBePositive} = 0.1;
+        options.opttol (1,1) {mustBePositive} = 0.1;
         options.contdir (1,1) {mustBeMember(options.contdir,[-1,1])} = 1;
     end
 

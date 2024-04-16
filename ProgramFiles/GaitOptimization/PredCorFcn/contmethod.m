@@ -56,7 +56,7 @@ function q = contmethod(Hfcn,q0,options)
     JHrank = zeros(1,options.iterlimit);
     q(:,1) = q0;
 
-    % try
+%     try
     for i = 1:options.iterlimit
 
         % predictor step
@@ -134,17 +134,17 @@ function q = contmethod(Hfcn,q0,options)
             end
         end
 
-        if abs(H(1)) > options.optimalitystop
-            fprintf("It is a suboptimal point! Optimality %d < tolerance %d. \n",abs(H(1)), options.optimalitystop);
+        if abs(H(1)) > options.opttol
+            fprintf("It is a suboptimal point! Optimality %d < tolerance %d. \n",abs(H(1)), options.opttol);
             break;
         end
     end
     q(:,i:end) = [];
-    % catch ME
-    %     disp(ME.identifier);
-    %     warning(ME.message);
-    %     q(:,i:end) = [];
-    % end
+%     catch ME
+%         disp(ME.identifier);
+%         warning(ME.message);
+%         q(:,i:end) = [];
+%     end
 end
 
 function tH = predictor(JH,projvec,options)

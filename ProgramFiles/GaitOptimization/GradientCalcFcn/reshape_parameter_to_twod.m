@@ -21,8 +21,9 @@ function y=reshape_parameter_to_twod(y,gopt)
 end
 
 function y = internal_function(y,gopt)
-    dimension = gopt.dimension;
 
+    dimension = gopt.dimension;
+    
     y = reshape(y,[], dimension);
 
     % If the frequency term does not exist, add it.

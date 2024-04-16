@@ -49,8 +49,10 @@ function [H, JH, projvec, stop] = steeringcontfunc(y,s,gopt)%,lb,ub,writerObj)
     % Hessian and gradient
     gopt.issubopt = false;
     [jacobfourier1,~,temp_stroke,disp1.f] = evaluate_jacobian_fourier(p,s,gopt);
+    hessfourier1 = numerhessfourier(p,s,gopt);
     gopt.issubopt = true;
     [jacobfourier2,~,~,disp2.f] = evaluate_jacobian_fourier(p,s,gopt);
+    hessfourier2 = numerhessfourier(p,s,gopt);
     gopt.issubopt = false;
     stroke.f = temp_stroke;
 
@@ -60,11 +62,6 @@ function [H, JH, projvec, stop] = steeringcontfunc(y,s,gopt)%,lb,ub,writerObj)
     stroke.gf = reshape(jacobfourier1.stroke,[], 1);
 
     % Calculate the Hessian of efficiency in the x direction.
-    gopt.issubopt = false;
-    hessfourier1 = numerhessfourier(p,s,gopt);
-    gopt.issubopt = true;
-    hessfourier2 = numerhessfourier(p,s,gopt);
-    gopt.issubopt = false;
     disp1.hf = cell2mat(hessfourier1.disp);
     disp2.hf = cell2mat(hessfourier2.disp);
     stroke.hf = cell2mat(hessfourier1.stroke);
@@ -78,7 +75,8 @@ function [H, JH, projvec, stop] = steeringcontfunc(y,s,gopt)%,lb,ub,writerObj)
         obj = deal(stroke);
         [const{2},const{1}] = atan2_derivative(eff2,eff1);
         const{1}.f = const{1}.f-c02;
-        projvec = [zeros(length(y)-1,1);-1];
+%         projvec = [zeros(length(y)-1,1);-1];
+        projvec = [-stroke.gf; zeros(length(y)-nptotal-1,1); -1];
 
         if const{2}.f < 0.1
             stop = 1;
