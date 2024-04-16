@@ -118,10 +118,11 @@ function [frame_info, endframe] = sysplotter_animation(frame_gen_function,frame_
 %		if export(i)
 			
 			% Ensure that destination directory exists
-            [parent,movie] = fileparts(destination{i});
-			if ~exist(parent,'dir')
-				mkdir(parent)
-			end
+            [parent{i},movie{i}] = fileparts(destination{i});
+			if ~exist(parent{i},'dir')
+				mkdir(parent{i})
+            end
+            destination{i} = fullfile(parent{i},movie{i});
 
 % 			% Move any current contents of the directory into a temp directory, so
 % 			% that they are not overwritten until the full new set of frames is
@@ -195,7 +196,7 @@ function [frame_info, endframe] = sysplotter_animation(frame_gen_function,frame_
                     % Save current frame
                     % Compatability with old code warning: Remove the image type
                     % input from the printmethod function and it should work.
-%                     F{j}(i).cdata = rgb2ind(frame_info{j}.printmethod('-RGBImage'),colormap,'nodither');
+%                   F{j}(i).cdata = rgb2ind(frame_info{j}.printmethod('-RGBImage'),colormap,'nodither');
                     F{j}(i).cdata = frame_info{j}.printmethod('-RGBImage');
                     % TODO: change F into a cell array of these sorts
                     % of things so that the gait tracing animations can be
@@ -258,16 +259,23 @@ function [frame_info, endframe] = sysplotter_animation(frame_gen_function,frame_
                 videoformat = 'MPEG-4';
             else
                 videoformat = 'Motion JPEG AVI';
-            end
-
-            v = VideoWriter(destination{j},videoformat);
+            end            
+            
+            v = VideoWriter(movie{j},videoformat);
             v.FrameRate = timing.fps;
             open(v)
             writeVideo(v,F{j})
             close(v)
-                
+            
+            moviename{j} = [movie{j} '.' v.FileFormat];
+            if isfile(moviename{j})
+                movefile(moviename{j}, parent{j});
+            end
         %end
     end
+
+    disp("Saved animation files in ");
+    disp(parent{1});
 
 %     % Close the figures used during animation making:
 %     fignums = [17; 171; 172; 173]; % Hardcoded from animate_backbone...

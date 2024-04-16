@@ -18,7 +18,7 @@ function validate_cost_gradient(s,n,y,g,p)
 % Set the delta in the fourier coefficients between individual cost
 % evaluations
 fourier_delta = 0.001;
-[grad_alphaddot,grad_alphadot,grad_alpha] = shape_grad(n,y,g);
+[grad_alphaddot,grad_alphadot,grad_alpha] = shape_grad(y);
 % Go through each of the fourier coefficients and test how applying
 % fourier_delta to each of them matches with the cost gradient calculated
 % by inertia_gradient_helper

@@ -22,7 +22,7 @@ function varargout = optimization_gui(varargin)
 
 % Edit the above text to modify the response to help optimization_gui
 
-% Last Modified by GUIDE v2.5 23-Sep-2022 23:13:41
+% Last Modified by GUIDE v2.5 02-May-2023 23:15:58
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -161,3 +161,76 @@ function rotationcheckbox_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of rotationcheckbox
+
+
+% --- Executes on button press in stepoptxbutton.
+function stepoptxbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to stepoptxbutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of stepoptxbutton
+
+
+% --- Executes on button press in stepoptybutton.
+function stepoptybutton_Callback(hObject, eventdata, handles)
+% hObject    handle to stepoptybutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of stepoptybutton
+
+
+% --- Executes on button press in stepoptthetabutton.
+function stepoptthetabutton_Callback(hObject, eventdata, handles)
+% hObject    handle to stepoptthetabutton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of stepoptthetabutton
+
+
+% --- Executes on selection change in MainDirectionPopupmenu.
+function MainDirectionPopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to MainDirectionPopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns MainDirectionPopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from MainDirectionPopupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function MainDirectionPopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MainDirectionPopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in SubDirectionPopupmenu.
+function SubDirectionPopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to SubDirectionPopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns SubDirectionPopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from SubDirectionPopupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function SubDirectionPopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SubDirectionPopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

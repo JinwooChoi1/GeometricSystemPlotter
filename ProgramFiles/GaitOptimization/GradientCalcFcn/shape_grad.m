@@ -1,11 +1,8 @@
-function [grad_alphaddot,grad_alphadot,grad_alpha] = shape_grad(n,y,g)
+function [grad_alphaddot,grad_alphadot,grad_alpha] = shape_grad(y)
 % Calculates the gradient of the shape position, velocity, and acceleration
 % with respect to the fourier coefficients.
-% Inputs:
-%   n: Number of points composing the gait when using shape-space
-%       parametrization
+% Inputs
 %   y: Set of fourier coefficients parametrizing the gait
-%   g: Time period of the gait
 
 % Get the fourier frequency, number of shape variables, and number of
 % fourier coefficientsinertia_cost_gradient

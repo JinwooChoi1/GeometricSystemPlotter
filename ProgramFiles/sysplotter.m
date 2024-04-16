@@ -22,7 +22,7 @@ function varargout = sysplotter(varargin)
 
 % Edit the above text to modify the response to help sysplotter
 
-% Last Modified by GUIDE v2.5 06-May-2021 16:25:08
+% Last Modified by GUIDE v2.5 24-Jul-2023 16:05:36
 
     addpath('./Utilities')
 
@@ -89,7 +89,8 @@ function varargout = sysplotter(varargin)
         assignin('base','sysplotter_inputpath',inputpath);
         
 	else
-		warning('Configuration file points to a directory without the necessary subdirectories')
+
+        warning('Configuration file points to a directory without the necessary subdirectories')
 		return
 	end
 

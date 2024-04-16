@@ -22,8 +22,9 @@ else
 end
 
 % Create the output file
-fido = fopen(fullfile(shchpath,['shchf_' paramfilename '.m']),'w');
+fido = fopen(strcat(shchpath,'\shchf_',paramfilename,'.m'),'w');
 
+paramfilename = char(paramfilename);
 
 while ~feof(fidi)
     
@@ -31,15 +32,17 @@ while ~feof(fidi)
 	s = fgetl(fidi);
 
     % Insert the shchf filename
-    s = strrep(s,'AA_SHCHFILENAME',['shchf_' paramfilename]);
+    s = replace(s,'AA_SHCHFILENAME',['shchf_' paramfilename]);
     
     % Give this file the correct paramfile
-    s = strrep(s,'AA_PARAMSNAME',paramfilename);
+    s = replace(s,'AA_PARAMSNAME',paramfilename);
     
     % Insert the displayname
-    s = strrep(s,'AA_DISPLAYNAME',displayname);
+    s = replace(s,'AA_DISPLAYNAME',displayname);
     
     % Copy put the line into the new file
     fprintf(fido,'%s\n',s);
     
 end
+
+fclose(fido);

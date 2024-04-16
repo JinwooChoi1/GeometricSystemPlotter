@@ -62,7 +62,7 @@ function h = create_elements(info_needed)
 	
     set(h.f,...
         'position',...
-        [600 1500 800 350],...
+        [600 600 800 350],...
         'paperposition',[0 0 10 4.5],...
         'papersize',[10 4.5],...
         'Color','w',...
@@ -134,12 +134,14 @@ function h = create_elements_shapespace(info_needed)
 
 	% Create lists to iterate along for shape space axis creation, and then
 	% trim out movies that aren't being made
-	fignums = [171; 172; 173; 181; 182; 183];
+	fignums = [171; 172; 173; 181; 182; 183; 191];
 	fignums(~export_list(2:end)) = [];
     
 	% Name the plots to draw into those windows, and trim them to just the
 	% plots being made
-	fignames = {'CCF X';'CCF Y';'CCF Theta'; 'Avec X';'Avec Y';'Avec Theta'};
+	fignames = {'CCF X';'CCF Y';'CCF Theta';...
+        'Avec X';'Avec Y';'Avec Theta';...
+        'Configuration'};
     
         if strcmp(info_needed.Coordinates,'minperturbation_coords')
             fignamessuffix = ' min. perturbation coords';
@@ -152,7 +154,7 @@ function h = create_elements_shapespace(info_needed)
 
     %%%%%
     % Internal names used by sys_draw
-    figinternal = {'X';'Y';'T';'X';'Y';'T'};
+    figinternal = {'X';'Y';'T';'X';'Y';'T';'S'};
         if strcmp(info_needed.Coordinates,'minperturbation_coords')
             figinternalsuffix = 'opt';
         else
@@ -164,7 +166,9 @@ function h = create_elements_shapespace(info_needed)
      
     %%%%%%
     % Category of plots to make
-    figcategory = {'CCF';'CCF';'CCF';'vfield';'vfield';'vfield'};
+    figcategory = {'CCF_draw';'CCF_draw';'CCF_draw';...
+        'vfield_draw';'vfield_draw';'vfield_draw';...
+        'illustrate_shapespace'};
     figcategory(~export_list(2:end)) = [];
 	
     %%%%%%
@@ -187,7 +191,7 @@ function h = create_elements_shapespace(info_needed)
             
             % Identify the function with the drawing code
             underlying_function{idx} = ...
-                fullfile(info_needed.sysplotterpath,'sys_draw_fcns',[figcategory{idx} '_draw']);        
+                fullfile(info_needed.sysplotterpath,'sys_draw_fcns',figcategory{idx});        
 		
 	end
 	
@@ -224,7 +228,12 @@ function h = create_elements_shapespace(info_needed)
 
     % Call the drawing function
     for idx = 1:numel(plot_info)
-        hh(idx,1) = absolute_feval(underlying_function{idx},s,[],plot_info(idx),[],'null',resolution);
+        if strcmp(figinternal{idx},'Sopt')
+            absolute_feval(underlying_function{idx},s,fignums);
+            h{idx}.ax = gca;
+        else
+            hh(idx,1) = absolute_feval(underlying_function{idx},s,[],plot_info(idx),[],'null',resolution);
+        end
     end
 	
 	% Remove click callbacks on axes created
@@ -240,11 +249,16 @@ function h = create_elements_shapespace(info_needed)
     end
     
     load('sysplotter_config','Colorset')
-    
+
     % Now create a tracer-and-dot on each axis
 	for i = 1:numel(h)
-		h{i}.tl = line('Parent',h{i}.ax,'XData',[],'YData',[],'ZData',[],'LineWidth',7,'Color',Colorset.spot); %Tracer line
-		h{i}.tld = line('Parent',h{i}.ax,'XData',[],'YData',[],'ZData',[],'LineWidth',5,'Color',Colorset.spot,'Marker','o','MarkerFaceColor',Colorset.spot,'MarkerSize',10,'LineStyle','none');
+        if strcmp(figinternal{idx},'Sopt')
+            h{i}.tl = line('Parent',h{i}.ax,'XData',[],'YData',[],'ZData',[],'LineWidth',5,'Color',Colorset.spot); %Tracer line
+            h{i}.tld = line('Parent',h{i}.ax,'XData',[],'YData',[],'ZData',[],'LineWidth',3,'Color',Colorset.spot,'Marker','o','MarkerFaceColor',Colorset.spot,'MarkerSize',7,'LineStyle','none');
+        else
+            h{i}.tl = line('Parent',h{i}.ax,'XData',[],'YData',[],'ZData',[],'LineWidth',7,'Color',Colorset.spot); %Tracer line
+            h{i}.tld = line('Parent',h{i}.ax,'XData',[],'YData',[],'ZData',[],'LineWidth',5,'Color',Colorset.spot,'Marker','o','MarkerFaceColor',Colorset.spot,'MarkerSize',10,'LineStyle','none');
+        end
 	end
 
 end
@@ -375,12 +389,16 @@ function [shapedata, posdata] = gait_concatenator(shaperaw,posraw,n_gaits,start_
 		% xy components (uses the start-pos to offset the starting xy
 		% position so that it passes through the center of the frame at the
 		% halfway point of the movie
-		posdata_xy_augmented = ...
+% 		posdata_xy_augmented = ...
+%             powerm_pade(cyclic_displacement_m,...  % Take the displacement over one gait cycle
+%                 +start_pos...                      % Raise it to the negative power of the starting offset (so that we start back from the origin
+%                 +(i-1))...                         % For each subsequent gait, shift if forward by one gait cycle
+% 			*posraw_xy_augmented(:,first_index:end); % Apply the starting offset for this cycle (calculated in the lines above) to the within-cycle displacements
+        posdata_xy_augmented = ...
             powerm_pade(cyclic_displacement_m,...  % Take the displacement over one gait cycle
-                +start_pos...                      % Raise it to the negative power of the starting offset (so that we start back from the origin
-                +(i-1))...                         % For each subsequent gait, shift if forward by one gait cycle
-			*posraw_xy_augmented(:,first_index:end); % Apply the starting offset for this cycle (calculated in the lines above) to the within-cycle displacements
-		
+                (i-1))...                         % For each subsequent gait, shift if forward by one gait cycle
+			*posraw_xy_augmented(:,first_index:end);
+
 		% theta component (always starts at zero orientation)		
 		posdata_theta = ...
             posraw(first_index:end,3)'... % Take the theta values from the within-gait displacement

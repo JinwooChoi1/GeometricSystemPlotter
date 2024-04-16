@@ -1,4 +1,4 @@
-function y = path_from_fourier(p,n,dimension)
+function y = path_from_fourier(p,n,dimension,t0)
 % Returns the shape space parametrization of the gait at n points when provided with
 % the fourier coefficients f. The gait is returned as a self-closed gait
 % (i.e. the first and last rows of the output y are the same point).
@@ -12,8 +12,13 @@ function y = path_from_fourier(p,n,dimension)
     % Determine time period based on value of fourier frequency
     w = p(end,1);
     T = 2*pi/w;
+
+    if ~exist('t0','var')
+        t0 = 0;
+    end
+
     % Create time vector at which to evaluate points of gait
-    t = linspace(0,T,n+1);
+    t = linspace(t0,T+t0,n+1);
     % Evaluate the shape-space parametrization of the gait at every time
     % value in t
     for j=1:dimension

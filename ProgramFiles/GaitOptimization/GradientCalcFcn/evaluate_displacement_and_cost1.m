@@ -56,7 +56,9 @@ function [net_disp_orig, net_disp_opt, cost] = evaluate_displacement_and_cost1(s
         tspan = [0 2*pi/y(end,1)];
     end
 
-    
+    if (isfield(p,'T'))&&(~exist('tspan','var'))
+        tspan = [0 p.T];
+    end
     
 	switch IntegrationMethod
 		

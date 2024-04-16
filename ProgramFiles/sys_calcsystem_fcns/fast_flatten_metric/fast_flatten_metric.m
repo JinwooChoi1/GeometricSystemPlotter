@@ -92,10 +92,12 @@ function [convert,sol] = fast_flatten_metric(grid,metric,mask)
 	
 	% Convert points
 	convert.stretch.old_to_new_points = @(x_old,y_old) convert_points(griddual{:},final_x,final_y,x_old,y_old);
-	Fx = TriScatteredInterp([final_x(:) final_y(:)],griddual{1}(:));
-	Fy = TriScatteredInterp([final_x(:) final_y(:)],griddual{2}(:));
+	Fx = scatteredInterpolant([final_x(:) final_y(:)],griddual{1}(:));
+	Fy = scatteredInterpolant([final_x(:) final_y(:)],griddual{2}(:));
     Fz = zeros(size(Fx));
-	convert.stretch.new_to_old_points = @(x_new,y_new) multiTriInterp(Fx,Fy,Fz,x_new,y_new);
+    Fx.Method = 'natural';
+    Fy.Method = 'natural';
+	convert.stretch.new_to_old_points = @(x_new,y_new) [Fx(x_new,y_new);Fy(x_new,y_new)];
 	
 	% Jacobian from old to new tangent vectors
 	final_jacobian = find_jacobian(griddual{:},final_x,final_y);
@@ -156,9 +158,11 @@ function [convert,sol] = fast_flatten_metric(grid,metric,mask)
     
     % Convert points
 	convert.surface.old_to_new_points = @(x_old,y_old) convert_points_two_three(griddual{:},final_x1,final_y1,final_z1,x_old,y_old);
-	Fx = TriScatteredInterp([final_x1(:) final_y1(:) final_z1(:)],griddual{1}(:));
-	Fy = TriScatteredInterp([final_x1(:) final_y1(:) final_z1(:)],griddual{2}(:));
-	convert.surface.new_to_old_points = @(x_new,y_new) multiTriInterp(Fx,Fy,x_new,y_new,z_new);
+	Fx = scatteredInterpolant([final_x1(:) final_y1(:) final_z1(:)],griddual{1}(:));
+	Fy = scatteredInterpolant([final_x1(:) final_y1(:) final_z1(:)],griddual{2}(:));
+    Fx.Method = 'natural';
+    Fy.Method = 'natural';
+	convert.surface.new_to_old_points = @(x_new,y_new,z_new) [Fx(x_new,y_new,z_new);Fy(x_new,y_new,z_new)];
 	
 % 	% Jacobian from old to new tangent vectors
 % 	final_jacobian = find_jacobian(griddual{:},final_x,final_y);

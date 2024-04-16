@@ -5,7 +5,6 @@ function illustrate_shapespace(system,target)
 
     load('sysplotter_config','Colorset')
 
-
     % Specify plot number as 177 unless specified otherwise
     if ~exist('target','var')
         target = 177;
@@ -157,4 +156,11 @@ function illustrate_shapespace(system,target)
             end
         end
     end
+
+
+    %Label the axes
+    label_shapespace_axes(target,[],0);
+
+    %Set the tic marks
+    set_tics_shapespace(target,system);
 end

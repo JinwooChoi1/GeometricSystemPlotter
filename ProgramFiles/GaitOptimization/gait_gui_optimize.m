@@ -135,14 +135,19 @@ alpha_plot = ppval(spline_alpha,t_plot)';
 % Both buttons in Optimizer and Step-Optimizer panel have same tags
 % They are distinguished by the array determined by the order of panel.
 direction = 0;
-if optimization_handles.xbutton(OptFamily+1).Value
-    direction = 1;
-elseif optimization_handles.ybutton(OptFamily+1).Value
-    direction = 2;
-elseif optimization_handles.thetabutton(OptFamily+1).Value
-    direction = 3;
-elseif (optimization_handles.steeringbutton.Value) && (OptFamily)
-    direction = 4;
+if OptFamily == 1
+    direction = optimization_handles.MainDirectionPopupmenu.Value;
+    if optimization_handles.SubDirectionPopupmenu.Value ~= 1
+        subdirection = optimization_handles.SubDirectionPopupmenu.Value - 1;
+    end
+else
+    if optimization_handles.xbutton.Value
+        direction = 1;
+    elseif optimization_handles.ybutton.Value
+        direction = 2;
+    elseif optimization_handles.thetabutton.Value
+        direction = 3;
+    end
 end
 
 %Cost function to optimize over
@@ -181,44 +186,22 @@ end
 f=fullfile(datapath,strcat(current_system,'_calc.mat'));
 load(f,'s');
 
-%%%% Set lower and upper bounds on optimization
-
-% Get the lower and upper bounds on the grid
-lvals = s.grid_range(1:2:end);
-uvals = s.grid_range(2:2:end);
-
-
-% Get the center of the grid
-mvals = (uvals + lvals)/2;
-
-% Get the lower and upper grid bounds relative to the center of the grid
-dlvals = lvals-mvals;
-duvals = uvals-mvals;
-
-% scale the differences by .95
-sdlvals = dlvals * 0.95;
-sduvals = duvals * 0.95;
-
-% Add the scaled differences to the center
-slvals = mvals+sdlvals;
-suvals = mvals+sduvals;
-
-% Tile these out to a matrix with as many rows as there are time points
-lb = 0.95 * repmat(slvals,[(n_plot+1),1]);
-ub = 0.95 * repmat(suvals,[(n_plot+1),1]);
-
-% Stack the lower bound values and the upper bound values
-lb = lb(:);
-ub = ub(:);
-
 %%%%% Call the optimizer
-y = optimalgaitgenerator(s,n_dim,n_plot,alpha_plot,lb,ub,stretch,direction,costfunction,constraint,OptFamily,handles);
+if exist("subdirection","var")
+    gaitoptoptions = optimalgaitoptions(s,'dimension',n_dim,'npoints',n_plot, ...
+        'boundarydensity',0.25,'costfunction',costfunction,'direction',direction, ...
+        'subdirection',subdirection,'familyoptimization',OptFamily,'constraint',constraint);
+else
+    gaitoptoptions = optimalgaitoptions(s,'dimension',n_dim,'npoints',n_plot, ...
+        'boundarydensity',0.25,'costfunction',costfunction,'direction',direction, ...
+        'familyoptimization',OptFamily,'constraint',constraint);
+end
+y = optimalgaitgenerator(s,alpha_plot,stretch,handles,gaitoptoptions);
 
 t = t_plot;
 t_new = t(1):(t(2)-t(1))/4:t(end);
 
 if(OptFamily)
-
     alpha_out = cell(4,1);
     for i = 1:4
         % reshape the output and add the start point to the end to close the loop
@@ -246,7 +229,7 @@ cd(current_dir)    % Go back to original directory
 
 sysf_func = str2func(current_system);
 shch_func = str2func(current_shch);
-effnames = {'X','Y','Theta'};
+effnames = {'X','Y','Theta','Steering'};
 if (OptFamily)
     optimizerdisplaytext = 'StepOpt: [';
     optimizerfiletext = 'stepopt_';
@@ -268,7 +251,7 @@ paramfiletext = [optimizerfiletext,paramfiletext];
 %     save(fullfile(shchpath,strcat(paramfilenamebare,'_optimal.mat')),'alpha1','alpha2','t')
 
 if (n_dim >= 2) && (n_dim <= 5)
-    % The optimal gait from step-optimizer is a 4x1 cell array.
+    % The optimal gait from family optimizer is a 4x1 cell array.
     if(OptFamily)
         for i = 1:n_dim
             % The string makes "alphai = cell(4,1);"

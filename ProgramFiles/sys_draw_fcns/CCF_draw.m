@@ -225,7 +225,7 @@ function plot_info = CCF_draw(s,p,plot_info,sys,shch,resolution)
                     case 'surface'
                         
                         meshhandle = surf(ax,grid{:},grid_extra,H{function_number});
-                        colormap(Colorset.colormap); 
+                        colormap(ax,Colorset.colormap); 
                         shading(ax,'interp')
                         axis(ax,'equal')
                         axis(ax,'tight')

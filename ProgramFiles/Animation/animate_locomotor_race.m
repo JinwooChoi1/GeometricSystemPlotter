@@ -97,9 +97,13 @@ function h = create_elements(info_needed)
     
     gait_name = cell(size(seed_name));
 	
+%     for idx_system = 1:numel(system_name)
+%         paramfilehash = hash(['opt_',system_name{idx_system},'_',seed_name{idx_system},'_',optcostfunction{idx_system},'_' 'X' 'eff'],'md5');
+%         gait_name{idx_system} = ['opt_',paramfilehash];
+%     end
+
     for idx_system = 1:numel(system_name)
-        paramfilehash = hash(['opt_',system_name{idx_system},'_',seed_name{idx_system},'_',optcostfunction{idx_system},'_' 'X' 'eff'],'md5');
-        gait_name{idx_system} = ['opt_',paramfilehash];
+        gait_name{idx_system} = seed_name{idx_system};
     end
     
 

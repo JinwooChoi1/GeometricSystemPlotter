@@ -17,12 +17,12 @@ function cost_grad = inertia_cost_gradient(s,n,y,g,gait,EvaluationMethod)
 
     % Contribution to gradient from the movement of each point due to
     % change in fourier coefficients
-    [grad_alphaddot,grad_alphadot,grad_alpha] = shape_grad(n,y,g);
+    [grad_alphaddot,grad_alphadot,grad_alpha] = shape_grad(y);
 
     cost_grad = zeros(size(grad_alpha));
     tspan = [0 g];
     if strcmpi(EvaluationMethod,'discrete')
-        num_pts = 100;
+        num_pts = n;
         t_pts = linspace(0,g,num_pts);
         del_t = t_pts(2) - t_pts(1);
         

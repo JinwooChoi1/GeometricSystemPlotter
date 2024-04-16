@@ -1,4 +1,4 @@
-function jacobianstroke = jacobianstrokecalculator(y,n,dimension,metric,metricgrad)
+function [jacobianstroke,l] = jacobianstrokecalculator(y,n,dimension,metric,metricgrad)
     % Calculates the gradient of cost for drag dominated systems.
     % Inputs:
     %   y: matrix containing points that transcribe the gait

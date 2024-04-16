@@ -22,7 +22,7 @@ function varargout = animation_gui(varargin)
 
 % Edit the above text to modify the response to help animation_gui
 
-% Last Modified by GUIDE v2.5 07-Sep-2018 12:53:48
+% Last Modified by GUIDE v2.5 06-Mar-2023 15:46:22
 
 % Begin initialization code - DO NOT EDIT
 
@@ -215,3 +215,12 @@ function checkbox_vfieldtheta_movie_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox_vfieldtheta_movie
+
+
+% --- Executes on button press in checkbox_shapespace_movie.
+function checkbox_shapespace_movie_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox_shapespace_movie (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox_shapespace_movie

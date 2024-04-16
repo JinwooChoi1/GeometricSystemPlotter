@@ -122,4 +122,16 @@ function [net_disp_orig, cost] = fixed_step_integrator(s,gait,tspan,ConnectionEv
 	dcost = [dcost{:}];
 	cost = trapz(tpoints,dcost);
 
+    % Assign value for totalstroke, i.e. the cost metric used for efficiency
+    % calculation
+    if strcmpi(s.costfunction,'torque') ||...
+        strcmpi(s.costfunction,'covariant acceleration') ||...
+        strcmpi(s.costfunction,'acceleration coord') ||...
+        strcmpi(s.costfunction,'power quality')
+        % With cost as time period, period of the gait is the cost to execute
+        % the gait at unit torque squared to the 1/4th power
+        cost = cost^(1/4);
+    end
+
+
 end

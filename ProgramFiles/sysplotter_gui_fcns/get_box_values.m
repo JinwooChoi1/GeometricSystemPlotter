@@ -35,9 +35,9 @@ function [checkbox_names,...
     %text for the different components
     plot_subtypes = { {'X','Y','T'},...               % Vfield
                       {'X','Y','T'},...               % CCF
-                      {''},...                        % mfield
+                      {'M','Co','Dual'},...           % mfield
                       {''},...                        % shapespace
-                      {'X','Y','T'},...              % disp
+                      {'X','Y','T'},...               % disp
                       {'X','Y','T'},...               % beta
                       {'X','Y','T'},...               % dbeta
                       {'traj','net','BVI','cBVI'}};   % xy

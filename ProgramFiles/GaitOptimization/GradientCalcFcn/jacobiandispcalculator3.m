@@ -1,4 +1,4 @@
-function a=jacobiandispcalculator3(p1,p2,p3,ccf,dimension)
+function a=jacobiandispcalculator3(p1,p2,p3,ccf,dimension,dccf)
 %%%%%%%%%
 %
 % jacobiandispcalculator3 is the function that calculates the gradient of 
@@ -36,6 +36,16 @@ for i=1:dimension
             f=(j-1)*dimension-(j*(j-1))/2+k;
             jacobian(1,i)=jacobian(1,i)+0.5*ccf(f)*((veca*perp')*(vecb*base')-(vecb*perp')*(veca*base'));
         end
+    end
+end
+
+if dimension == 2 && exist('dccf','var')
+    p23 = p3-p2;
+    p21 = p1-p2;
+
+    area = 1/2*(p23(1)*p21(2)-p23(2)*p21(1));
+    for i = 1:dimension
+        jacobian(1,i) = jacobian(1,i) + dccf(1,i)*area;
     end
 end
 

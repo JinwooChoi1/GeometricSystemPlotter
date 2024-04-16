@@ -2,8 +2,8 @@ function vp = generate_locomotor_race(makevideo)
 
 load sysplotter_config.mat
 
-info_needed = struct('Framerate',15,...
-                     'Duration',3,...
+info_needed = struct('Framerate',60,...
+                     'Duration',10,...
                      'Coordinates','minperturbation_coords',...
                      'sysplotterpath', sysplotterpath,...
                      'datapath', datapath,...
@@ -182,10 +182,17 @@ vp.fourmodes.covaccel.costlist = {'covariant acceleration','covariant accelerati
 sys = 'serp';
 cost = 'covaccel';
 
-        info_needed.current_system2 = vp.(sys).(cost).systemlist;
-        info_needed.current_shch2 = vp.(sys).(cost).gaitlist;
-        info_needed.costfunction = vp.(sys).(cost).costlist;
+%         info_needed.current_system2 = vp.(sys).(cost).systemlist;
+%         info_needed.current_shch2 = vp.(sys).(cost).gaitlist;
+%         info_needed.costfunction = vp.(sys).(cost).costlist;
+%         info_needed.moviename = [sys '_' cost];
+
+        info_needed.current_system2 = {'three_link_lowRe_Extend','three_link_lowRe_Extend','three_link_lowRe_Extend','three_link_lowRe_Extend'};
+        info_needed.current_shch2 = {'opt_threelinksteering1','opt_threelinksteering2','opt_threelinksteering3','opt_threelinksteering4'};
+        info_needed.optcostfunction = {'pathlength metric','pathlength metric','pathlength metric','pathlength metric'};
+        info_needed.evalcostfunction = {'pathlength metric','pathlength metric','pathlength metric','pathlength metric'};
         info_needed.moviename = [sys '_' cost];
+
 
 
         [vp.(sys).(cost).normalizedPeriod, vp.(sys).(cost).netDisp] = animate_locomotor_race(0,info_needed,makevideo);

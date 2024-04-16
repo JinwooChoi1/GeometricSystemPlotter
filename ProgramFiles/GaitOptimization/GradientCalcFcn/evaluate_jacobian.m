@@ -1,12 +1,12 @@
-function [jacobian,lineint,totalstroke,y,invert] = evaluate_jacobian(f,s,n,dimension,direction,lb,ub,~)
+function [jacobian,avgd_vel,totalstroke,avgd_vel_dir] = evaluate_jacobian(f,s,gopt)
 %%%%%%%%%%%%%
 % This function calculates the gradient of displacement and cost function
 % with respect to the coefficients obtained by 
-% the fourier series parametrization
+% the waypoint series parametrization
 % 
 % Inputs: 
 % 
-% y: Matrix containing the Fourier series coefficients
+% f: Matrix containing the Fourier series coefficients
 % s: System file which contains the connection vector field, CCF's and
 %   metric data
 % dimension: Indicates the number of shape variables of the system
@@ -23,66 +23,86 @@ function [jacobian,lineint,totalstroke,y,invert] = evaluate_jacobian(f,s,n,dimen
 % lineint : the displacement for the gait
 % totalstroke : the cost for the gait
 %%%%%%%%%%%%%
-if (isstruct(f))
-    y = [f.phi_def{1}(linspace(0,T,n).'),f.phi_def{2}(linspace(0,T,n)).'];
-    T = 2*pi;
+
+n = gopt.npoints;
+dimension = gopt.dimension;
+if (gopt.issubopt)
+    direction = gopt.subdirection;
 else
-    y = path_from_fourier(f,n,dimension);
+    direction = gopt.direction;
+end
+
+%% Check the system type.
+% for inertia-dominated systems, systemtype = 1.
+% for drag-dominated systems, systemtype = 0.
+if strcmpi(gopt.costfunction,'torque') ||...
+        strcmpi(gopt.costfunction,'covariant acceleration') ||...
+        strcmpi(gopt.costfunction,'acceleration coord') ||...
+        strcmpi(gopt.costfunction,'power quality')
+    systemtype = 1;
+else
+    systemtype = 0;
+end
+
+%% Obtaining points from the gait parameters
+if (isstruct(f))
+    T = f.T;
+    for fn = fieldnames(f).'
+        p.(fn{:}) = f.(fn{:});
+    end
+    y = [f.phi_def{1}(linspace(0,T,n+1)).',f.phi_def{2}(linspace(0,T,n+1)).'];
+    y = y(1:end-1,:);
+else
     p = makeGait(f);
+    y = path_from_fourier(f,n,dimension);
     T = 2*pi/f(end,1);
     y = y(1:end-1,:);
 end
-% Calculate displacement, cost and efficiency of a gait
+
+%% Calculate displacement, cost and efficiency of a gait
 % Note that, for inertial cost, cost is returned as the integral of torque
 % squared, while for drag-based systems, cost is the path length of the
 % gait
-[~, net_disp_opt, cost] = evaluate_displacement_and_cost1(s,p,[0, T],'interpolated','fixed_step');
-lineint=net_disp_opt(direction); % displacement produced in the chosen direction produced on executing the gait measured in the optimal coordinates 
+s.costfunction = gopt.costfunction;
+[~, net_disp_opt, totalstroke] = evaluate_displacement_and_cost1(s,p,[0, T],'interpolated','fixed_step');
 
-% Assign value for totalstroke, i.e. the cost metric used for efficiency
-% calculation
-if strcmpi(s.costfunction,'torque') || strcmpi(s.costfunction,'covariant acceleration') || strcmpi(s.costfunction,'acceleration coord') || strcmpi(s.costfunction,'power quality')
-    % With cost as time period, period of the gait is the cost to execute
-    % the gait at unit torque squared to the 1/4th power
-    totalstroke = cost^(1/4);
-else
-    % Drag systems have cost as path length, so no modification is needed
-    totalstroke = cost;
-end
+% The coordinate of gradient is on the exponential coordinate, 
+% but the net displacement derived by line integral is on the original
+% coordinate. Take the matrix logarithms on the net displacement.
+avgd_vel = se2log(net_disp_opt);
+
+% displacement produced in the chosen direction produced on executing 
+% the gait measured in the optimal coordinates 
+avgd_vel_dir = avgd_vel(direction);
 
 % If efficiency is negative, reversing the order of points so that
 % efficiency is positive
-if lineint<0
-    lineint= -lineint;
-    y=flip(y);
-    invert=1;
-else
-    invert=0;
-end
+% if lineint<0
+%     lineint= -lineint;
+%     y=flip(y);
+%     invert=1;
+% else
+%     invert=0;
+% end
 
 %% Preliminaries for gradient calculation
-ccf = ccf_interpolator(y,s,n,dimension,direction);
+[ccf,dccf] = ccf_interpolator(y,s,n,dimension,direction);
 [metric,metricgrad] = metric_interpolator(y,s,n,dimension);
 
 %% Jacobianstroke is the gradient of cost. 
-%Contrigrad is the contribution to the gradient ue to the metric changing
-
+% Contrigrad is the contribution to the gradient ue to the metric changing
 jacobian = struct();
 
-switch s.costfunction
-    case {'pathlength metric','pathlength coord','pathlength metric2'}
-        % Get the gradient of cost based on drag-dominated system
-        jacobian.stroke = jacobianstrokecalculator(y,n,dimension,metric,metricgrad);
-    case {'torque','covariant acceleration','acceleration coord','power quality'}
-        % Get the gradient of cost based on inertia-dominated system
-        inertia_cost_grad = inertia_cost_gradient(s,n,coeff,T,p,'discrete');
-        
-        % With cost as time period to execute the gait, the gradient of
-        % cost for inertial systems is the gradient of cost with period 1
-        % divided by (4*T^3)
-        inertia_cost_grad = inertia_cost_grad./(4*totalstroke^3);
-    otherwise
-        error('Unexpected system type at cost gradient calculation!')
+%% Checking if the system is inertia-dominated or drag-dominated
+if systemtype == 0
+    % Get the gradient of cost based on drag-dominated system
+    [jacobian.stroke,l] = jacobianstrokecalculator(y,n,dimension,metric,metricgrad);
+elseif systemtype == 1
+    % The gradient of cost for inertia-dominated system should be
+    % calculated at evaluate_jacobian_fourier.
+    jacobian.stroke = [];
+else
+    error('Unexpected system type at cost gradient calculation!')
 end
 
 %% Jacobiandisp is the gradient of displacement.
@@ -90,41 +110,27 @@ end
 % displacement for the ith point. It's input arguments are the coordinates of 
 % the (i-1)th, ith and (i+1)th point, CCF value at point i and the dimension of     
 % the shape space (dimension)
-
-
 jacobian.disp = zeros(n,dimension);
 for i=2:1:n-1
-    jacobian.disp(i,:)=jacobiandispcalculator3(y(i-1,:),y(i,:),y(i+1,:),ccf(i,:),dimension);
+    jacobian.disp(i,:)=jacobiandispcalculator3(y(i-1,:),y(i,:),y(i+1,:),ccf(i,:),dimension,dccf(i,:));
 end
-jacobian.disp(1,:)=jacobiandispcalculator3(y(n,:),y(1,:),y(2,:),ccf(1,:),dimension);
-jacobian.disp(n,:)=jacobiandispcalculator3(y(n-1,:),y(n,:),y(1,:),ccf(n,:),dimension);
+jacobian.disp(1,:)=jacobiandispcalculator3(y(n,:),y(1,:),y(2,:),ccf(1,:),dimension,dccf(1,:));
+jacobian.disp(n,:)=jacobiandispcalculator3(y(n-1,:),y(n,:),y(1,:),ccf(n,:),dimension,dccf(n,:));
 
 %% Jacobianeqi is the concentration gradient. 
 %It is the term that keeps points eqi distant from each other and prevents crossover of gait.
-
-jacobian.eqi = jacobianeqicalculator(y,n,dimension,metric);
-
-%% Jacobina.repuls is the repulsive vector field for a joint limit.
-jacobian.repuls = zeros(n,dimension);
-if ~isempty(lb)
-    lb = reshape(lb,[n+1 dimension]);
-    lb = lb(1:n,:);
-    jacobian.repuls = jacobian.repuls + 5*sech(10*(y-lb)).^2;
+if systemtype == 0
+    jacobian.eqi = jacobianeqicalculator(y,n,dimension,metric);
+else
+    jacobian.eqi = zeros(n,dimension);
 end
 
-if ~isempty(ub)
-    ub = reshape(ub,[n+1 dimension]);
-    ub = ub(1:n,:);
-    jacobian.repuls = jacobian.repuls + 5*sech(10*(ub-y)).^2;
-end
-
-%% properly ordering gradients depending on whether lineint was negative or positive
-if invert
-    y=flip(y);
-    jacobian.disp=flip(jacobian.disp);
-    jacobian.eqi=flip(jacobian.eqi);
-    jacobian.stroke=flip(jacobian.stroke);
-end
+%% properly ordering gradients depending on whether lineint was negative
+% if invert
+%     y=flip(y);
+%     jacobian.disp=flip(jacobian.disp);
+%     jacobian.eqi=flip(jacobian.eqi);
+%     jacobian.stroke=flip(jacobian.stroke);
+% end
 
 end
-

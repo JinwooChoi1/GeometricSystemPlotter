@@ -11,17 +11,17 @@ varargout = cell(nargout,1);
 % change to the target directory, run the function, then return to original
 % directory
 current_dir = pwd;
-cd(t_path);
+%cd(t_path);
 
 try % if this doesn't go through, will cause error below and drop back one level in the program
     filefunction = str2func(t_name);
 	[varargout{:}] = filefunction(varargin{:});
 catch ME
-	cd(current_dir)
+	%cd(current_dir)
 	rethrow(ME) % treat the error from feval as if it had happened, but first return to previous working directory
 end
 
 
-cd(current_dir);
+%cd(current_dir);
 
 end

@@ -6,7 +6,8 @@ function overlay_shape_change_2d(ax,p,stretch,convert,isomap,s)
 	load(configfile,'Colorset');
 
     %plot all paths
-	for i = 1:numel(p.phi_locus)
+    n = numel(p.phi_locus);
+	for i = 1:n
 
 
 		if stretch
@@ -37,11 +38,12 @@ function overlay_shape_change_2d(ax,p,stretch,convert,isomap,s)
 %   %          plot_dir_arrows(p.phi_locus_full{i}.shape(:,1),p.phi_locus_full{i}.shape(:,2),p.phi_arrows{i}{1},isomap,s,'Color',Colorset.spot,'LineWidth',4,'Parent',ax);
 % 
 %         else
-            
-            line(pathpoints{:},'Color',Colorset.spot,'LineWidth',5,'Parent',ax);
+            coloridx = floor(250-(i-1)*125/n);
+            linecolor = Colorset.colormap(coloridx,:);
+            line(pathpoints{:},'Color',linecolor,'LineWidth',5,'Parent',ax);
 
             %draw the direction arrows on the line
-            plot_dir_arrows(p.phi_locus_full{i}.shape(:,1),p.phi_locus_full{i}.shape(:,2),p.phi_arrows{i}{1},'Color',Colorset.spot,'LineWidth',4,'Parent',ax);
+            plot_dir_arrows(p.phi_locus_full{i}.shape(:,1),p.phi_locus_full{i}.shape(:,2),p.phi_arrows{i}{1},'Color',linecolor,'LineWidth',4,'Parent',ax);
 
 %         end
 
