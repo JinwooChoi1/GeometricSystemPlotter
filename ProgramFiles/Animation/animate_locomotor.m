@@ -31,7 +31,6 @@ function animate_locomotor(export,info_needed)
 	frame_info{1} = create_elements(info_needed); %setup function, defined below in file
 	frame_info = [frame_info;create_elements_shapespace(info_needed)]; % set up shapespace plots
 
-	
 	% Designate animation function
 	frame_gen_function...
 		= @execute_gait; % frame function, defined below in file
@@ -389,6 +388,7 @@ function [shapedata, posdata] = gait_concatenator(shaperaw,posraw,n_gaits,start_
 		% xy components (uses the start-pos to offset the starting xy
 		% position so that it passes through the center of the frame at the
 		% halfway point of the movie
+
 % 		posdata_xy_augmented = ...
 %             powerm_pade(cyclic_displacement_m,...  % Take the displacement over one gait cycle
 %                 +start_pos...                      % Raise it to the negative power of the starting offset (so that we start back from the origin

@@ -12,9 +12,13 @@ function [Inertia_link_system,Inertia_link_local] = Inertia_link(h,J_full,L,link
     
     rotational_inertia_link = mass_link*(a^2+b^2)/4;
     
-    added_mass = fluid_density * diag([pi*b^2, pi*a^2, (a^2-b^2)^2]);
+    added_mass = fluid_density * diag([pi*b^2, pi*a^2, pi/8*(a^2-b^2)^2]);
     
     Inertia_link_local = diag([mass_link,mass_link,rotational_inertia_link]) + added_mass;
+
+    %Test to match inertia tensor to 2x drag tensor for comparison
+%     ar = link_shape_parameters.aspect_ratio;
+%     Inertia_link_local = diag([L,L/ar,L^3/(ar*12)]);
     
     
     % Pullback of local inertia to body velocity/shape velocity coordinates

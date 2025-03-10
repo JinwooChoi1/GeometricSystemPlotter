@@ -35,7 +35,7 @@ function yi=optimalgaitfamilygenerator(s,y0,mu0,stretch,handles,gopt)
 
     ncp_fcn = @(y) noncomplfun(y,gopt);
     out_fcn = @(y,i) contoutfun(y,i,s,stretch,handles,gopt);
-    options = contoptions('algorithm','PredCor','h',0.1,'nulltol',0.05,'opttol',0.5, ...
+    options = contoptions('algorithm','PredCor','h',0.5,'nulltol',0.05,'opttol',0.5, ...
         'breaktol',0.1,'ncpfcn',ncp_fcn,'outfcn',out_fcn);
     q = contmethod(cont_fcn,y0,options);
 
@@ -77,7 +77,7 @@ function yi=optimalgaitfamilygenerator(s,y0,mu0,stretch,handles,gopt)
         out_fcn = @(y,i) contoutfun(y,i,s,stretch,handles,gopt);
         options = contoptions('algorithm','PredCor','h',0.1, ...
             'opttol',0.5,'nulltol',0.2,'ncpfcn',ncp_fcn,'outfcn',out_fcn);
-        for i = 2:size(newq,1)
+        for i = 1:size(newq,1)
             [y0,~,~,mu0,~] = contvardistributor(newq{i}(1,:).',gopt);
             
             y0_2d = reshape_parameter_to_twod(y0,gopt);

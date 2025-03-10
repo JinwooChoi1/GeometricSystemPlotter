@@ -11,7 +11,7 @@ function gait_param_to_sysplotter(y,paramfiletext)
     n_dim = size(y,2);
     n = 100;
 
-    alpha_out = -path_from_fourier(y,n,n_dim,0.5);
+    alpha_out = path_from_fourier(y,n,n_dim);
 
     w = y(end,1);
     t = linspace(0,2*pi/w,n+1);

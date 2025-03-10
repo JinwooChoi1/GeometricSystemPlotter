@@ -32,7 +32,6 @@ function [f,l] = plot_from_fourier(y,nfparam,dimension,figurenum,options)
         if size(y1,2) == 2
             [new_y1(:,1),new_y1(:,2)] = options.Stretch.old_to_new_points(y1(:,1),y1(:,2));
             y1=new_y1;
-            y1 = -y1;
         else
             error("This function does not supprot 3d metric stretch.")
         end

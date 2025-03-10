@@ -1,4 +1,0 @@
-
-    STEP   DAMPING               NORMS              COMPUTATION TIMES
-  IT SIT     GAMMA     ||d||     ||f||     ||U||   F(x)  DF(x)  SOLVE
-   0                          0.00e+00  1.50e+00    0.0    0.0    0.0

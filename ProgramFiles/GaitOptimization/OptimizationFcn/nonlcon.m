@@ -22,6 +22,7 @@ else
     direction = gopt.direction;
 end
 constraint = gopt.constraint;
+s.costfunction = gopt.costfunction;
 
 %% Getting a discrete waypoint series of Fourier Gait.
 
@@ -62,7 +63,9 @@ if constraint(1) == 1
         if idx ~= direction
             Aeq(end+1) = net_disp_opt(idx);
             if nargout > 2
-                jacobfourier = evaluate_jacobian_fourier(y,s,n,dimension,idx);
+                gopt_copy = gopt;
+                gopt_copy.direction = idx;
+                jacobfourier = evaluate_jacobian_fourier(y,s,gopt_copy);
                 gdisp = [jacobfourier.disp; zeros(1,dimension)];              
                 gdisp = reshape(gdisp,[size(y,1)*dimension,1]);
                 gAeq(:,end+1) = gdisp.';

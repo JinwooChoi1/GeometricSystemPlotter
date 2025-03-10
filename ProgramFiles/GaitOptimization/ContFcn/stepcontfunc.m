@@ -52,7 +52,7 @@ function [H, JH, projvec, stop] = stepcontfunc(y,s,gopt)%,lb,ub,writerObj)
     [H,JH] = constructHfunc(y,obj,const,gopt);
 
     % Set the stop condition.
-    if const.f < 1e-2
+    if const.f < 1e-3
         stop = 1;
     else
         stop = 0;
